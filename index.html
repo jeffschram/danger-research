@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holly & Jeff Installation Venues - Research Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.active {
+            background: #48bb78;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            background: #ed8936;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .file-label:hover {
+            background: #dd7724;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 30px;
+            line-height: 1.6;
+        }
+
+        .tier {
+            margin-bottom: 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .tier-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tier-header:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        .tier-content {
+            padding: 5%;
+            display: block;
+            background: #fafafa;
+        }
+
+        .tier-content.collapsed {
+            display: none;
+        }
+
+        .tier-content h3 {
+            background: #e2e8f0;
+            color: #2d3748;
+            padding: 15px 25px;
+            margin: 0 0 2rem 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-bottom: 1px solid #cbd5e0;
+        }
+
+        .tier-content > ul, .tier-content > ol {
+            /* list-style: none;
+            padding: 0;
+            margin: 0; */
+            margin-left:  2rem;
+        }
+
+        .tier-content > ol > li {
+            block: 3rem;
+       }
+
+        .tier-content > p, .tier-content > div {
+            padding: 0 25px;
+            margin: 15px 0;
+        }
+
+        .tier-content ul li {
+            margin: 0 0 1rem 1rem;
+            padding: 0;
+        }
+
+        /* Enhanced typography for tier content */
+        .tier-content h4 {
+            color: #2d3748;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 20px 25px 12px;
+        }
+
+        .tier-content p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin: 12px 0;
+        }
+
+        .tier-content strong {
+            color: #1a202c;
+            font-weight: 600;
+        }
+
+        .tier-content code {
+            background: #f7fafc;
+            color: #805ad5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Improved list styling within tiers */
+        .tier-content > ul:not(.venue-list) {
+            padding-left: 25px;
+        }
+
+        .tier-content > ul:not(.venue-list) li {
+            margin: 8px 0;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        /* Status indicators */
+        .contact-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .phone {
+            color: #38a169;
+            font-weight: 500;
+            background: #f0fff4;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Mailing address formatting */
+        .address {
+            color: #4a5568;
+            font-style: italic;
+            background: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-left: 3px solid #cbd5e0;
+            margin: 8px 0;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        /* Responsive adjustments for venue cards */
+        @media (max-width: 768px) {
+            .venue {
+                margin: 15px 15px;
+            }
+            
+            .venue-header {
+                padding: 15px 20px 12px;
+            }
+            
+            .venue-body {
+                padding: 15px 20px;
+            }
+            
+            .venue-title {
+                font-size: 1.1em;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .contact-info {
+                padding: 15px;
+            }
+            
+            .tier-content h3 {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+        }
+
+        .venue {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0;
+            margin: 20px 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+        }
+
+        .venue:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-3px);
+            border-color: #cbd5e0;
+        }
+
+        .venue.confirmed {
+            border-left: 6px solid #48bb78;
+            background: white;
+        }
+
+        .venue.confirmed:hover {
+            border-left-color: #38a169;
+        }
+
+        .venue.has-form {
+            border-left: 6px solid #4299e1;
+            background: white;
+        }
+
+        .venue.has-form:hover {
+            border-left-color: #3182ce;
+        }
+
+        .venue > ul, .venue > ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .venue p {
+            margin: 12px 0;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .venue p:first-of-type {
+            margin-top: 0;
+        }
+
+        .venue p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .venue strong {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .venue em {
+            color: #718096;
+            font-style: italic;
+            display: block;
+            margin: 8px 0;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .venue-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0;
+            padding: 20px 25px 15px;
+            border-bottom: 1px solid #f7fafc;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .venue-header {
+            background: #f8f9fa;
+            padding: 20px 25px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            margin: 0;
+        }
+
+        .venue-body {
+            padding: 20px 25px;
+        }
+
+        .venue-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .venue-description {
+            color: #718096;
+            font-style: italic;
+            font-size: 0.95em;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .venue-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-confirmed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-form {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .contact-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 18px;
+            margin: 18px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .contact-info h4 {
+            color: #2d3748;
+            margin: 0 0 12px 0;
+            font-size: 1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-item {
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            color: #4a5568;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-item strong {
+            color: #2d3748;
+            font-weight: 600;
+            min-width: fit-content;
+        }
+
+        .contact-label {
+            font-weight: 600;
+            color: #2d3748;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .email {
+            color: #3182ce;
+            text-decoration: none;
+            font-weight: 500;
+            background: #ebf8ff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .email:hover {
+            background: #bee3f8;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .url {
+            color: #805ad5;
+            text-decoration: none;
+            word-break: break-all;
+            font-weight: 500;
+            background: #faf5ff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: inline-block;
+            margin: 2px 0;
+        }
+
+        .url:hover {
+            background: #e9d8fd;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .strategy {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 18px 0;
+            color: #92400e;
+            font-size: 0.95em;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .strategy:before {
+            content: "💡";
+            position: absolute;
+            top: 16px;
+            left: 16px;
+        }
+
+        .strategy strong {
+            color: #78350f;
+        }
+
+        .strategy-content {
+            margin-left: 24px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            color: #4a5568;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 300px;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: none;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Holly & Jeff Installation Venues</h1>
+            <p>Research Dashboard - 50 Target Venues for Collaborative Video Installations</p>
+        </div>
+        
+        <div class="controls">
+            <label for="fileInput" class="file-label">📁 Load Markdown File</label>
+            <input type="file" id="fileInput" class="file-input" accept=".md">
+            
+            <button class="btn" id="refreshLoad" style="background: #ed8936;">🔄 Try Auto-Load</button>
+            
+            <button class="btn active" id="showAll">Show All</button>
+            <button class="btn" id="showConfirmed">⭐ Confirmed Contacts</button>
+            <button class="btn" id="showForms">🌐 Has Submission Forms</button>
+            
+            <input type="text" class="search-box" id="searchBox" placeholder="Search venues...">
+        </div>
+
+        <div class="content">
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number" id="totalVenues">50</span>
+                    <span class="stat-label">Total Venues</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="confirmedContacts">5</span>
+                    <span class="stat-label">Confirmed Contacts</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="submissionForms">3</span>
+                    <span class="stat-label">Submission Forms</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number" id="readyToContact">5</span>
+                    <span class="stat-label">Ready to Contact</span>
+                </div>
+            </div>
+
+            <div id="markdownContent">
+                <div style="text-align: center; padding: 50px; color: #666;">
+                    <h3>📁 Load Your Research File</h3>
+                    <p>Click "Load Markdown File" above and select your <code>holly-jeff-installation-venues.md</code> file to view your research in this beautiful interface!</p>
+                    <p style="margin-top: 20px; font-size: 0.9em;">
+                        <strong>Alternative:</strong> If running from a web server, the file will load automatically.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Try to load the markdown file automatically (if served from HTTP server)
+        async function tryAutoLoad() {
+            console.log('Current URL:', window.location.href);
+            console.log('Base URL:', window.location.origin + window.location.pathname.replace(/[^/]*$/, ''));
+            
+            const filenames = [
+                'holly-jeff-installation-venues.md',
+                './holly-jeff-installation-venues.md',
+                '../holly-jeff-installation-venues.md'
+            ];
+            
+            for (const filename of filenames) {
+                try {
+                    console.log(`Trying to fetch: ${filename}`);
+                    const response = await fetch(filename);
+                    console.log(`Fetch response for ${filename}:`, response.status, response.statusText);
+                    
+                    if (response.ok) {
+                        const content = await response.text();
+                        console.log(`Successfully loaded ${filename}, content length:`, content.length);
+                        processMarkdown(content);
+                        
+                        // Update the UI to show it loaded automatically
+                        const loadMessage = document.createElement('div');
+                        loadMessage.style.cssText = `
+                            position: fixed; 
+                            top: 20px; 
+                            right: 20px; 
+                            background: #48bb78; 
+                            color: white; 
+                            padding: 12px 20px; 
+                            border-radius: 8px; 
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                            z-index: 1000;
+                            font-size: 14px;
+                            font-weight: 500;
+                        `;
+                        loadMessage.textContent = `✅ Auto-loaded: ${filename}`;
+                        document.body.appendChild(loadMessage);
+                        
+                        // Remove the message after 3 seconds
+                        setTimeout(() => loadMessage.remove(), 3000);
+                        
+                        return; // Success, stop trying other filenames
+                    }
+                } catch (error) {
+                    console.log(`Fetch failed for ${filename}:`, error.message);
+                }
+            }
+            
+            console.log('Auto-load failed for all attempted filenames. File must be loaded manually.');
+            
+            // Show a helpful message in the content area
+            const contentDiv = document.getElementById('markdownContent');
+            const currentContent = contentDiv.innerHTML;
+            
+            if (currentContent.includes('Load Your Research File')) {
+                contentDiv.innerHTML = `
+                    <div style="text-align: center; padding: 50px; color: #666;">
+                        <h3>🔍 Auto-load Status</h3>
+                        <p><strong>Tried to auto-load:</strong></p>
+                        <ul style="text-align: left; display: inline-block; margin: 20px 0;">
+                            ${filenames.map(f => `<li><code>${f}</code></li>`).join('')}
+                        </ul>
+                        <p>None found. Please use <strong>"📁 Load Markdown File"</strong> button above.</p>
+                        <p style="margin-top: 20px; font-size: 0.9em; color: #888;">
+                            <em>Check browser console (F12) for detailed debugging info.</em>
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // File input handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type === 'text/markdown') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    processMarkdown(e.target.result);
+                };
+                reader.readAsText(file);
+            }
+        });
+        
+        // Manual refresh/retry button
+        document.getElementById('refreshLoad').addEventListener('click', function() {
+            console.log('Manual auto-load retry triggered');
+            tryAutoLoad();
+        });
+
+        function processMarkdown(content) {
+            const html = marked.parse(content);
+            const contentDiv = document.getElementById('markdownContent');
+            contentDiv.innerHTML = html;
+            
+            // Enhance the display
+            enhanceVenueDisplay();
+            setupFiltering();
+            updateStats();
+        }
+
+        function enhanceVenueDisplay() {
+            const content = document.getElementById('markdownContent');
+            
+            // Convert headers to collapsible sections
+            const headers = content.querySelectorAll('h2');
+            headers.forEach(header => {
+                if (header.textContent.includes('TIER')) {
+                    const tierDiv = document.createElement('div');
+                    tierDiv.className = 'tier';
+                    
+                    const tierHeader = document.createElement('div');
+                    tierHeader.className = 'tier-header';
+                    tierHeader.innerHTML = `
+                        ${header.textContent}
+                        <span class="toggle-icon">▼</span>
+                    `;
+                    
+                    const tierContent = document.createElement('div');
+                    tierContent.className = 'tier-content';
+                    
+                    // Move content after header into tier content
+                    let nextElement = header.nextElementSibling;
+                    while (nextElement && !nextElement.textContent.includes('TIER') && nextElement.tagName !== 'H2') {
+                        const temp = nextElement.nextElementSibling;
+                        tierContent.appendChild(nextElement);
+                        nextElement = temp;
+                    }
+                    
+                    tierDiv.appendChild(tierHeader);
+                    tierDiv.appendChild(tierContent);
+                    header.parentNode.replaceChild(tierDiv, header);
+                    
+                    // Add click handler
+                    tierHeader.addEventListener('click', () => {
+                        tierContent.classList.toggle('collapsed');
+                        tierHeader.querySelector('.toggle-icon').classList.toggle('rotated');
+                    });
+                }
+            });
+
+            // Enhance venue items
+            const listItems = content.querySelectorAll('li');
+            listItems.forEach(item => {
+                const text = item.textContent;
+                if (text.includes('**') && (text.includes('Museum') || text.includes('Gallery') || text.includes('Center'))) {
+                    const venueDiv = document.createElement('div');
+                    venueDiv.className = 'venue';
+                    
+                    // Check for special statuses
+                    if (text.includes('⭐ CONTACT CONFIRMED') || text.includes('CONTACT CONFIRMED')) {
+                        venueDiv.classList.add('confirmed');
+                    }
+                    if (text.includes('🌐 SUBMISSION FORM') || text.includes('SUBMISSIONS ACCEPTED')) {
+                        venueDiv.classList.add('has-form');
+                    }
+                    
+                    venueDiv.innerHTML = item.innerHTML;
+                    
+                    // Enhance venue formatting
+                    formatVenueContent(venueDiv);
+                    
+                    item.parentNode.replaceChild(venueDiv, item);
+                }
+            });
+        }
+
+        function formatVenueContent(venueDiv) {
+            const content = venueDiv.innerHTML;
+            let html = content;
+            
+            // Split content into header and body sections
+            const parts = html.split(/(<strong>[^<]+<\/strong>)/);
+            if (parts.length >= 2) {
+                const title = parts[1]; // The first <strong> element (venue name)
+                const description = parts[2] ? parts[2].replace(/^\s*-\s*/, '').trim() : '';
+                const restContent = parts.slice(3).join('');
+                
+                // Create structured layout
+                html = `
+                    <div class="venue-header">
+                        <div class="venue-title">
+                            ${title.replace(/<\/?strong>/g, '')}
+                            ${content.includes('⭐ CONTACT CONFIRMED') ? '<span class="venue-status status-confirmed">⭐ CONTACT CONFIRMED</span>' : ''}
+                            ${content.includes('SUBMISSIONS ACCEPTED') ? '<span class="venue-status status-form">🌐 SUBMISSIONS ACCEPTED</span>' : ''}
+                        </div>
+                        ${description ? `<div class="venue-description">${description}</div>` : ''}
+                    </div>
+                    <div class="venue-body">
+                        ${restContent}
+                    </div>
+                `;
+            }
+            
+            // Clean up status markers from content
+            html = html.replace(/⭐ CONTACT CONFIRMED/g, '');
+            html = html.replace(/🌐 SUBMISSIONS ACCEPTED/g, '');
+            html = html.replace(/SUBMISSIONS ACCEPTED/g, '');
+            
+            // Format contact information with proper structure
+            html = html.replace(/📧 CONTACTS?:\s*/g, '<div class="contact-info"><h4>📧 CONTACTS</h4><div class="contact-items">');
+            html = html.replace(/🌐 SUBMISSION FORM:\s*/g, '<div class="contact-info"><h4>🌐 SUBMISSION FORM</h4><div class="contact-items">');
+            html = html.replace(/🌐 RESIDENCY SUBMISSIONS:\s*/g, '<div class="contact-info"><h4>🌐 RESIDENCY SUBMISSIONS</h4><div class="contact-items">');
+            
+            // Close contact info sections properly
+            html = html.replace(/(<div class="contact-info">[\s\S]*?)(?=<div class="contact-info">|<div class="strategy">|$)/g, '$1</div></div>');
+            
+            // Format strategy sections
+            html = html.replace(/Strategy:\s*/g, '<div class="strategy"><div class="strategy-content"><strong>Strategy:</strong> ');
+            html = html.replace(/(<div class="strategy">[\s\S]*?)(?=<div class="contact-info">|<div class="strategy">|$)/g, '$1</div></div>');
+            
+            // Format individual contact items
+            html = html.replace(/\*\*(.*?)\*\*\s*-\s*(.*?)(?=<br|$)/g, '<div class="contact-item"><strong>$1:</strong> $2</div>');
+            html = html.replace(/\*\*(.*?)\*\*\s*(.*?)(?=<br|$)/g, '<div class="contact-item"><strong>$1</strong> $2</div>');
+            
+            // Format emails and URLs with better styling
+            html = html.replace(/([\w\.-]+@[\w\.-]+\.\w+)/g, '<a href="mailto:$1" class="email">$1</a>');
+            html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="url">$1</a>');
+            
+            // Clean up any orphaned HTML and fix formatting
+            html = html.replace(/<\/div>\s*<\/div>\s*<\/div>/g, '</div></div>');
+            html = html.replace(/(<div class="contact-items">)\s*(<\/div><\/div>)/g, '$1<div class="contact-item">No specific contact information available</div>$2');
+            
+            // Fix line breaks and paragraphs
+            html = html.replace(/<br\s*\/?>/g, '');
+            html = html.replace(/\n\s*\n/g, '</p><p>');
+            
+            // Improve phone number formatting
+            html = html.replace(/(\+?\d{1,3}[\s\-\.]?\(?\d{3}\)?[\s\-\.]?\d{3}[\s\-\.]?\d{4})/g, '<span class="phone">$1</span>');
+            
+            // Format mailing addresses
+            html = html.replace(/\*\*Mailing:\*\*\s*(.*?)(?=<|$)/g, '<div class="address"><strong>📮 Mailing Address:</strong><br>$1</div>');
+            html = html.replace(/\*\*Contact:\*\*\s*(.*?)(?=<|$)/g, '<div class="contact-item"><span class="contact-label">📞 Contact:</span>$1</div>');
+            
+            venueDiv.innerHTML = html;
+        }
+
+        function setupFiltering() {
+            const showAll = document.getElementById('showAll');
+            const showConfirmed = document.getElementById('showConfirmed');
+            const showForms = document.getElementById('showForms');
+            const searchBox = document.getElementById('searchBox');
+            
+            showAll.addEventListener('click', () => {
+                filterVenues('all');
+                setActiveButton(showAll);
+            });
+            
+            showConfirmed.addEventListener('click', () => {
+                filterVenues('confirmed');
+                setActiveButton(showConfirmed);
+            });
+            
+            showForms.addEventListener('click', () => {
+                filterVenues('forms');
+                setActiveButton(showForms);
+            });
+            
+            searchBox.addEventListener('input', (e) => {
+                searchVenues(e.target.value);
+            });
+        }
+
+        function setActiveButton(activeBtn) {
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            activeBtn.classList.add('active');
+        }
+
+        function filterVenues(type) {
+            const venues = document.querySelectorAll('.venue');
+            
+            venues.forEach(venue => {
+                let show = true;
+                
+                switch(type) {
+                    case 'confirmed':
+                        show = venue.classList.contains('confirmed');
+                        break;
+                    case 'forms':
+                        show = venue.classList.contains('has-form');
+                        break;
+                    case 'all':
+                    default:
+                        show = true;
+                }
+                
+                venue.classList.toggle('hidden', !show);
+            });
+        }
+
+        function searchVenues(query) {
+            const venues = document.querySelectorAll('.venue');
+            const searchTerm = query.toLowerCase();
+            
+            venues.forEach(venue => {
+                const text = venue.textContent.toLowerCase();
+                const matches = text.includes(searchTerm);
+                venue.classList.toggle('hidden', !matches);
+            });
+        }
+
+        function updateStats() {
+            const venues = document.querySelectorAll('.venue');
+            const confirmed = document.querySelectorAll('.venue.confirmed');
+            const forms = document.querySelectorAll('.venue.has-form');
+            
+            document.getElementById('totalVenues').textContent = venues.length;
+            document.getElementById('confirmedContacts').textContent = confirmed.length;
+            document.getElementById('submissionForms').textContent = forms.length;
+            document.getElementById('readyToContact').textContent = confirmed.length;
+        }
+
+        // Try to auto-load the file
+        tryAutoLoad();
+    </script>
+</body>
+</html>
